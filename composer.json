@@ -1,0 +1,24 @@
+{
+    "name": "commune/compnt-dingtalk",
+    "description": "DingTalk component for commune/chatbot",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "thirdgerb",
+            "email": "thirdgerb@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Commune\\DingTalk\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.3",
+        "commune/chatbot-hyperf": "dev-master",
+        "mingyoung/dingtalk": "^2.0"
+    }
+}
