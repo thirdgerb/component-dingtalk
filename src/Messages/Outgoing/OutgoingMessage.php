@@ -103,7 +103,6 @@ class OutgoingMessage extends AbsMessage
         $sessionId = $this->isGroupConversation()
             ? $group->getSessionId()
             : $this->makeSessionId();
-        $messageId = $messageId ?? $this->msgId;
 
         return IInputMsg::instance(
             $this->getHostMessage(),
@@ -112,7 +111,7 @@ class OutgoingMessage extends AbsMessage
             $this->senderNick,
             '',
             null,
-            $messageId,
+            null,
             $group->id
         );
     }
