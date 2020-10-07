@@ -13,22 +13,61 @@ namespace Commune\DingTalk;
 
 
 use Commune\Blueprint\Configs\PlatformConfig;
+use Commune\Chatbot\Hyperf\Platforms\Http\HfHttpConfig;
+use Commune\Chatbot\Hyperf\Platforms\Http\HfHttpPlatform;
+use Commune\DingTalk\Providers\GroupBotsServiceProvider;
+use Commune\Platform\IPlatformConfig;
 
 /**
  * Commune/studio-hyperf 为钉钉提供的企业 Outgoing 机器人服务端.
  *
  * 提供的基本功能有:
  *
- * - 多轮对话控制钉钉, 暂时只提供有限的对话控制能力.
- * - 接受钉钉的事件回调, 可主动触发多轮对话.
- * - 接受 Host 的全局事件, 主动推送消息或触发多轮对话.
- *
- * 注册到 studio 的 config.platforms 中.
- *
+ * - outgoing 机器人: 通过多轮对话控制钉钉, 暂时只提供有限的对话控制能力.
+ * - webhook 机器人: 接受钉钉的事件回调, 可主动触发多轮对话.
+ * - 钉钉群 webhook : 可以主动推送消息给钉钉群.
  *
  * @author thirdgerb <thirdgerb@gmail.com>
  */
-class DingTalkPlatformConfig implements PlatformConfig
+class DingTalkPlatformConfig extends IPlatformConfig implements PlatformConfig
 {
+
+
+    public static function stub(): array
+    {
+        return [
+            'id' => 'ding',
+            'name' => 'DingTalk',
+            'desc' => '钉钉机器人的对接平台',
+            'concrete' => HfHttpPlatform::class,
+            'bootShell' => null,
+            'bootGhost' => false,
+            'providers' => [
+                GroupBotsServiceProvider::class => [
+                    'groupBots' => [
+                        [
+                            'id' => 'test',
+                            'url' => '/ding-talk/bots/test',
+                            'botName' => 'test',
+                            'appKey' => '',
+                            'appSecret' => '',
+                        ],
+                    ]
+                ]
+            ],
+            'options' => [
+                HfHttpConfig::class => [
+                    'server' => [
+                        'name' => 'dingtalk',
+                        'host' => '127.0.0.1',
+                        'port' => 9510,
+                    ],
+                    'processes' => [],
+                    'routes' => [],
+                ],
+            ],
+        ];
+    }
+
 
 }

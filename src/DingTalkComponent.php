@@ -13,6 +13,8 @@ namespace Commune\DingTalk;
 
 
 use Commune\Blueprint\Framework\App;
+use Commune\DingTalk\Configs\EasyDingTalkConfig;
+use Commune\DingTalk\Configs\GroupBotConfig;
 use Commune\Framework\Component\AComponentOption;
 
 /**
@@ -22,19 +24,30 @@ use Commune\Framework\Component\AComponentOption;
  *
  *
  * @author thirdgerb <thirdgerb@gmail.com>
+ *
+ * @property-read GroupBotConfig[] $bots    机器人的相关配置
+ * @property-read EasyDingTalkConfig $easyDingTalk  easy ding talk 的相关配置.
  */
 class DingTalkComponent extends AComponentOption
 {
     public static function stub(): array
     {
         return [
+            'bots' => [
 
+            ],
+
+            'easyDingTalk' => [
+            ],
         ];
     }
 
     public static function relations(): array
     {
-        return [];
+        return [
+            'easyDingTalk' => EasyDingTalkConfig::class,
+            'groups[]' => GroupBotConfig::class,
+        ];
     }
 
     public function bootstrap(App $app): void

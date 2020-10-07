@@ -1,5 +1,5 @@
 {
-    "name": "commune/compnt-dingtalk",
+    "name": "commune/component-dingtalk",
     "description": "DingTalk component for commune/chatbot",
     "type": "library",
     "license": "MIT",
