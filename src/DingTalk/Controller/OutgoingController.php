@@ -169,8 +169,14 @@ class OutgoingController
         $passed = $now - $microTimestamp;
         if ($passed > 0 && $passed < 3600000) {
             $secret = $group->appSecret;
-            $stringToSign = $microTimestamp . "\n" . $secret;
-            $expect = base64_encode(hash_hmac('sha256', $stringToSign, $secret));
+            $stringToSign = utf8_encode($microTimestamp . "\n" . $secret);
+            $stringToSignBytes = array_map('ord', str_split($stringToSign));
+            $secretBytes = array_map('ord', str_split(utf8_encode($secret)));
+            $stringToSignEn = pack('C*', ...$stringToSignBytes);
+            $secretEn = pack('C*', ...$secretBytes);
+            $hashed = hash_hmac('sha256',  $stringToSignEn, $secretEn, true);
+            $expect = base64_encode($hashed);
+
 
             if ($sign === $expect) {
                 return null;
