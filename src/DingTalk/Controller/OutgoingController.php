@@ -156,7 +156,7 @@ class OutgoingController
     {
         $microTimestamp = $request->getHeaderLine('timestamp');
         $sign = $request->getHeaderLine('sign');
-        $now = time() * 1000;
+        $now = intval(microtime(true) * 1000) + 1;
 
         if (empty($microTimestamp) || empty($sign)) {
             return $this->emptyResponse($response);
