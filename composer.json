@@ -3,6 +3,14 @@
     "description": "DingTalk component for commune/chatbot",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "php",
+        "swoole",
+        "hyperf",
+        "chatops",
+        "commune",
+        "dingtalk"
+    ],
     "authors": [
         {
             "name": "thirdgerb",
