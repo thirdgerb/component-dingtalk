@@ -79,9 +79,10 @@ class IOutgoingHandler implements HasIdGenerator
         // 检查响应是不是有问题.
         $errCode = $appResponse->getErrcode();
 
+        $senderNick = $message->senderNick;
         if ($errCode === AppResponse::SUCCESS) {
             // 如果成功, 直接渲染返回结果.
-            return $this->renderResponse($response, $appResponse);
+            return $this->renderResponse($senderNick, $response, $appResponse);
         }
 
         $errMsg = $appResponse->getErrmsg();
@@ -175,11 +176,13 @@ class IOutgoingHandler implements HasIdGenerator
 
     /**
      * 渲染输出的响应.
+     * @param string $senderNick
      * @param ResponseInterface $response
      * @param ShellOutputResponse $appResponse
      * @return PsrResponse
      */
     protected function renderResponse(
+        string $senderNick,
         ResponseInterface $response,
         ShellOutputResponse $appResponse
     ) : PsrResponse
@@ -208,7 +211,7 @@ class IOutgoingHandler implements HasIdGenerator
         }, $rendering);
 
         $outputText = implode("\n\n----\n\n", $rendering);
-        $markdown = DTMarkdown::instance('', $outputText);
+        $markdown = DTMarkdown::instance("to $senderNick", $outputText);
 
         return $response->json($markdown->toDingTalkData());
     }
