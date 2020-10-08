@@ -137,10 +137,14 @@ class IOutgoingHandler implements HasIdGenerator
     {
         $input = $message->toInputMessage($group);
         $env = $this->wrapEnv($group, $message);
+        $entry = $message->isGroupConversation()
+            ? $group->entry
+            : $group->privateEntry;
+
         return IShellInputRequest::instance(
             false,
             $input,
-            $group->entry,
+            $entry,
             $env,
             null,
             $traceId
@@ -229,7 +233,7 @@ class IOutgoingHandler implements HasIdGenerator
 
         $outputText = implode("\n\n----\n\n", $rendering);
         $senderNick = $outgoing->senderNick;
-        $prefix = $outgoing->isGroupConversation() ? "to $senderNick: " : '';
+        $prefix = $outgoing->isGroupConversation() ? "to $senderNick: \n" : '';
 
         $markdown = DTMarkdown::instance(
             '',
