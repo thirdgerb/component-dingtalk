@@ -13,6 +13,7 @@
 namespace Commune\DingTalk\DingTalk\Handler;
 
 use Commune\Blueprint\Ghost\Cloner\ClonerEnv;
+use Commune\Blueprint\Ghost\Cloner\ClonerGuest;
 use Commune\Blueprint\Kernel\Protocals\AppResponse;
 use Commune\Blueprint\Kernel\Protocals\ShellInputRequest;
 use Commune\Blueprint\Shell;
@@ -158,10 +159,11 @@ class IOutgoingHandler implements HasIdGenerator
         OutgoingMessage $message
     ) : array
     {
+        $userLevel = $this->getUserLevel($config, $message);
         return [
             ClonerEnv::BOT_NAME_KEY => $config->botName,
             ClonerEnv::BOT_ID_KEY => $message->chatbotUserId,
-            ClonerEnv::USER_LEVEL_KEY => $config->userLevel,
+            ClonerEnv::USER_LEVEL_KEY => $userLevel,
             ClonerEnv::USER_INFO_KEY => [
                 "senderCorpId"=> $message->senderCorpId,
                 "senderStaffId"=> $message->senderStaffId,
@@ -172,6 +174,22 @@ class IOutgoingHandler implements HasIdGenerator
                 "conversationTitle"=> $message->conversationTitle,
             ]
         ];
+    }
+
+    /**
+     * 获取用户的级别.
+     * @param GroupBotConfig $config
+     * @param OutgoingMessage $message
+     * @return int
+     */
+    protected function getUserLevel(
+        GroupBotConfig $config,
+        OutgoingMessage $message
+    ) : int
+    {
+        $userId = $message->senderId;
+        $level = $config->userLevelMap[$userId] ?? ClonerGuest::GUEST;
+        return $level;
     }
 
     /**
@@ -211,7 +229,12 @@ class IOutgoingHandler implements HasIdGenerator
         }, $rendering);
 
         $outputText = implode("\n\n----\n\n", $rendering);
-        $markdown = DTMarkdown::instance("to $senderNick", $outputText);
+        $prefix = "to $senderNick: ";
+        $sessionId = $appResponse->getSessionId();
+        $markdown = DTMarkdown::instance(
+            "## session $sessionId",
+            $prefix . $outputText
+        );
 
         return $response->json($markdown->toDingTalkData());
     }

@@ -50,23 +50,19 @@ use Commune\Support\Option\AbsOption;
  * ## 机器人的多轮对话入口
  *
  * @property string $entry 机器人的群聊 context 入口.
- * @property string $privateEntry 机器人的私聊 context 入口
- * @property int $userLevel
+ * @property string $privateEntry 机器人的私聊语境入口. 私聊是无法异步推送的.
+ * 
+ * @property bool $isPublic 机器人是公共的, 还是私人的. 公共的, 则大家共享同一个会话. 私人的, 则每个用户和机器人的对话是独立的. 
  *
+ * ## 用户权限
+ *
+ * @property int[] $userLevelMap  群内用户的权限列表.
  *
 
  * ## 异步响应逻辑
  *
- * @property string|null $dingTalkWebHook 群的回调机器人web hook, 用于异步推送消息给群
- * @property string[] $communeEventHandlers 群监听的 Commune 事件, 接受到这些事件后, 用 handler 进行处理.
- * @property string[] $dingTalkEventHandlers 群监听的钉钉事件, 接受到这些事件后, 用 handler 进行处理.
- *
- *
- * ## 其它逻辑
- *
- * @property string $sessionIdSalt 如果希望对会话的 sessionId 进行特殊加密, 则可加点 salt. 一般情况下 sessionId 不需要特别加密.
- *
- *
+ * @property string|null $asyncWebHooks 机器人的异步回调接口. 异步消息会逐个推送到这些接口上. 
+ * @property string[] $listens 当前机器人监听的事件. 触发事件时, 会向机器人发送异步消息.
  *
  */
 class GroupBotConfig extends AbsOption
@@ -81,27 +77,47 @@ class GroupBotConfig extends AbsOption
     public static function stub(): array
     {
         return [
+            // 机器人的 id, 也作为 Scene 参数传给 ghost
             'id' => '',
+            // 机器人的名称
             'botName' => '',
+            // 钉钉分配的 agentId, 似乎用处不大
             'agentId' => 0,
+            // 钉钉分配的 appKey
             'appKey' => '',
+            // 钉钉机器人用于签名校验的 appSecret
             'appSecret' => '',
 
-            'entry' => '',
-            'privateEntry' => '',
-            'userLevel' => ClonerGuest::GUEST,
-
+            // 机器人的 web url, 不包含域名. 
+            // 例如 communechatbot.com/ding-talk/bots/defaults
+            // 对应的 url 是 ding-talk/bots/defaults
+            // 用于钉钉的 outgoing 消息推送地址. 
             'url' => '',
+            // 机器人的群入口对话.
+            'entry' => '',
+            // 机器人的私聊入口对话
+            'privateEntry' => '',
+
+            // 定义使用机器人的用户所属的级别.
+            'userLevelMap' => [
+                // 使用  string $id => int $level  的格式
+                // 'userId' => CloneGuest::SUPERVISE,
+            ],
+            
+            // 机器人是公共的, 还是 1对1 的.
+            // 决定每个用户对话时的 conversationId 是否一致.
+            'isPublic' => true,
+
+            // 机器人接受消息时的handler, 通常不用修改
             'outgoingHandler' => IOutgoingHandler::class,
 
-
-            'dingTalkWebHook' => null,
-            'communeEventHandlers' => [
-            ],
-            'dingTalkEventHandlers' => [
-            ],
-
-            'sessionIdSalt' => '',
+            // 机器人的异步回调接口. 异步消息会推送到这些接口上.
+            // 通常是群可以建立消息类型的机器人, 方便异步消息推送. 
+            'asyncWebHooks' => [],
+            
+            // 机器人监听的事件.
+            // 当一些回调事件被触发时, 会主动推送消息给监听这些事件的机器人. 
+            'listens' => [],
         ];
     }
 
@@ -114,7 +130,7 @@ class GroupBotConfig extends AbsOption
     public function getSessionId() : string
     {
         return $this->sessionId
-            ?? $this->sessionId = sha1($this->url. "::" . $this->sessionIdSalt);
+            ?? $this->sessionId = sha1($this->url. "::" . $this->id);
     }
 
 }

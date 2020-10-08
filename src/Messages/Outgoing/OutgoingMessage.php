@@ -99,24 +99,32 @@ class OutgoingMessage extends AbsMessage
      */
     public function toInputMessage(GroupBotConfig $group, string $messageId = null) : InputMsg
     {
+        // 群聊的时候, 大家共享相同的 session
+        if ($this->isGroupConversation()) {
+            $sessionId = $group->getSessionId();
+            // 但不一定共享相同的 conversationId
+            $convoId = $group->isPublic ? '' : $this->getPrivateSessionId();
+
+        // 私聊的时候, conversationId 是一致的.
+        } else {
+            $sessionId = $this->getPrivateSessionId();
+            $convoId = '';
+        }
         // 群的 session 是固定的, 个人不是.
-        $sessionId = $this->isGroupConversation()
-            ? $group->getSessionId()
-            : $this->makeSessionId();
 
         return IInputMsg::instance(
             $this->getHostMessage(),
             $sessionId,
             $this->senderId,
             $this->senderNick,
-            '',
+            $convoId,
             null,
-            null,
+            $messageId,
             $group->id
         );
     }
 
-    public function makeSessionId() : string
+    public function getPrivateSessionId() : string
     {
         return sha1("conversation:{$this->conversationId}:sender:{$this->senderId}");
     }
