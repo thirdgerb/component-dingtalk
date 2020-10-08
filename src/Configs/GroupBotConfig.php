@@ -12,9 +12,6 @@
 
 namespace Commune\DingTalk\Configs;
 
-
-use Commune\Blueprint\Framework\Auth\Supervise;
-use Commune\Blueprint\Ghost\Cloner\ClonerGuest;
 use Commune\DingTalk\DingTalk\Handler\IOutgoingHandler;
 use Commune\Support\Option\AbsOption;
 
@@ -61,7 +58,7 @@ use Commune\Support\Option\AbsOption;
 
  * ## 异步响应逻辑
  *
- * @property string|null $asyncWebHooks 机器人的异步回调接口. 异步消息会逐个推送到这些接口上. 
+ * @property string[]|null $asyncWebHooks 机器人的异步回调接口. 异步消息会逐个推送到这些接口上.
  * @property string[] $listens 当前机器人监听的事件. 触发事件时, 会向机器人发送异步消息.
  *
  */
