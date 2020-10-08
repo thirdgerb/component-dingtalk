@@ -13,36 +13,36 @@
 namespace Commune\DingTalk\Impl;
 
 
-use Commune\DingTalk\Configs\GroupBotConfig;
-use Commune\DingTalk\Contracts\GroupManager;
+use Commune\DingTalk\Configs\BotConfig;
+use Commune\DingTalk\Contracts\BotManager;
 
-class IGroupManager implements GroupManager
+class IBotManager implements BotManager
 {
 
     /**
-     * @var GroupBotConfig[]
+     * @var BotConfig[]
      */
     protected $urlToGroups = [];
 
     /**
-     * @var GroupBotConfig[]
+     * @var BotConfig[]
      */
     protected $sessionIdToGroups = [];
 
-    public function register(GroupBotConfig $group): void
+    public function register(BotConfig $group): void
     {
         $url = trim($group->url, '/');
         $this->urlToGroups[$url] = $group;
         $this->sessionIdToGroups[$group->getSessionId()] = $group;
     }
 
-    public function findGroupByUri(string $url): ? GroupBotConfig
+    public function findBotByUri(string $url): ? BotConfig
     {
         $url = trim($url, '/');
         return $this->urlToGroups[$url] ?? null;
     }
 
-    public function findGroupBySessionId(string $sessionId): ? GroupBotConfig
+    public function findBotBySessionId(string $sessionId): ? BotConfig
     {
         return $this->sessionIdToGroups[$sessionId] ?? null;
     }

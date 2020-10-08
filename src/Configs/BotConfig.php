@@ -58,11 +58,11 @@ use Commune\Support\Option\AbsOption;
 
  * ## 异步响应逻辑
  *
- * @property string[]|null $asyncWebHooks 机器人的异步回调接口. 异步消息会逐个推送到这些接口上.
+ * @property string[] $asyncWebHooks 机器人的异步回调接口. 异步消息会逐个推送到这些接口上.
  * @property string[] $listens 当前机器人监听的事件. 触发事件时, 会向机器人发送异步消息.
  *
  */
-class GroupBotConfig extends AbsOption
+class BotConfig extends AbsOption
 {
     const IDENTITY = 'id';
 

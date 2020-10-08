@@ -15,27 +15,26 @@ namespace Commune\DingTalk\Providers;
 use Commune\Chatbot\Hyperf\Platforms\Http\HfRouter;
 use Commune\Container\ContainerContract;
 use Commune\Contracts\ServiceProvider;
-use Commune\DingTalk\Configs\GroupBotConfig;
-use Commune\DingTalk\Contracts\GroupManager;
+use Commune\DingTalk\Configs\BotConfig;
+use Commune\DingTalk\Contracts\BotManager;
 use Commune\DingTalk\DingTalk\Controller\OutgoingController;
-use Commune\DingTalk\Impl\IGroupManager;
+use Commune\DingTalk\Impl\IBotManager;
 use Hyperf\HttpServer\Router\Router;
 
 
 /**
- * 企业群机器人服务
+ * 企业机器人服务
  *
  * @author thirdgerb <thirdgerb@gmail.com>
  *
- *
- * @property GroupBotConfig[] $groupBots
+ * @property BotConfig[] $bots
  */
-class GroupBotsServiceProvider extends ServiceProvider
+class CompanyBotsServiceProvider extends ServiceProvider
 {
     public static function stub(): array
     {
         return [
-            'groupBots' => [
+            'bots' => [
             ],
         ];
     }
@@ -43,7 +42,7 @@ class GroupBotsServiceProvider extends ServiceProvider
     public static function relations(): array
     {
         return [
-            'groupBots[]' => GroupBotConfig::class,
+            'bots[]' => BotConfig::class,
         ];
     }
 
@@ -55,15 +54,16 @@ class GroupBotsServiceProvider extends ServiceProvider
     public function boot(ContainerContract $app): void
     {
         /**
-         * @var GroupManager $manager
+         * @var BotManager $manager
          */
-        $manager = $app->make(GroupManager::class);
+        $manager = $app->make(BotManager::class);
 
-        $bots = $this->groupBots;
+        $bots = $this->bots;
         foreach ($bots as $bot) {
             $manager->register($bot);
         }
 
+        // 注册路由. 默认机器人在 Http 中启动.
         HfRouter::add(function() use ($bots) {
             foreach ($bots as $bot) {
                 Router::post($bot->url, [OutgoingController::class, 'onReceive']);
@@ -75,8 +75,8 @@ class GroupBotsServiceProvider extends ServiceProvider
     public function register(ContainerContract $app): void
     {
         $app->singleton(
-            GroupManager::class,
-            IGroupManager::class
+            BotManager::class,
+            IBotManager::class
         );
     }
 

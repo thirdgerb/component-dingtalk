@@ -30,7 +30,7 @@ use Commune\Support\Uuid\HasIdGenerator;
 use Commune\Support\Uuid\IdGeneratorHelper;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use Commune\DingTalk\Configs\GroupBotConfig;
+use Commune\DingTalk\Configs\BotConfig;
 use Psr\Http\Message\ResponseInterface as PsrResponse;
 use Psr\Log\LoggerInterface;
 
@@ -59,7 +59,7 @@ class IOutgoingHandler implements HasIdGenerator
 
     /**
      * @param ReqContainer $container
-     * @param GroupBotConfig $group
+     * @param BotConfig $group
      * @param RequestInterface $request
      * @param ResponseInterface $response
      * @param OutgoingMessage $message
@@ -67,7 +67,7 @@ class IOutgoingHandler implements HasIdGenerator
      */
     public function __invoke(
         ReqContainer $container,
-        GroupBotConfig $group,
+        BotConfig $group,
         RequestInterface $request,
         ResponseInterface $response,
         OutgoingMessage $message
@@ -80,10 +80,9 @@ class IOutgoingHandler implements HasIdGenerator
         // 检查响应是不是有问题.
         $errCode = $appResponse->getErrcode();
 
-        $senderNick = $message->senderNick;
         if ($errCode === AppResponse::SUCCESS) {
             // 如果成功, 直接渲染返回结果.
-            return $this->renderResponse($senderNick, $response, $appResponse);
+            return $this->renderResponse($message, $response, $appResponse);
         }
 
         $errMsg = $appResponse->getErrmsg();
@@ -126,13 +125,13 @@ class IOutgoingHandler implements HasIdGenerator
     /**
      * 将 Http 请求包装为 Ghost 请求
      * @param string $traceId
-     * @param GroupBotConfig $group
+     * @param BotConfig $group
      * @param OutgoingMessage $message
      * @return ShellInputRequest
      */
     protected function wrapRequest(
         string $traceId,
-        GroupBotConfig $group,
+        BotConfig $group,
         OutgoingMessage $message
     ) : ShellInputRequest
     {
@@ -150,12 +149,12 @@ class IOutgoingHandler implements HasIdGenerator
 
     /**
      * 包装环境变量.
-     * @param GroupBotConfig $config
+     * @param BotConfig $config
      * @param OutgoingMessage $message
      * @return array
      */
     protected function wrapEnv(
-        GroupBotConfig $config,
+        BotConfig $config,
         OutgoingMessage $message
     ) : array
     {
@@ -178,12 +177,12 @@ class IOutgoingHandler implements HasIdGenerator
 
     /**
      * 获取用户的级别.
-     * @param GroupBotConfig $config
+     * @param BotConfig $config
      * @param OutgoingMessage $message
      * @return int
      */
     protected function getUserLevel(
-        GroupBotConfig $config,
+        BotConfig $config,
         OutgoingMessage $message
     ) : int
     {
@@ -194,13 +193,13 @@ class IOutgoingHandler implements HasIdGenerator
 
     /**
      * 渲染输出的响应.
-     * @param string $senderNick
+     * @param OutgoingMessage $message
      * @param ResponseInterface $response
      * @param ShellOutputResponse $appResponse
      * @return PsrResponse
      */
     protected function renderResponse(
-        string $senderNick,
+        OutgoingMessage $message,
         ResponseInterface $response,
         ShellOutputResponse $appResponse
     ) : PsrResponse
@@ -229,10 +228,12 @@ class IOutgoingHandler implements HasIdGenerator
         }, $rendering);
 
         $outputText = implode("\n\n----\n\n", $rendering);
-        $prefix = "to $senderNick: ";
-        $sessionId = $appResponse->getSessionId();
+        $senderNick = $message->senderNick;
+
+        $prefix = $message->isGroupConversation() ? "to $senderNick: " : '';
+
         $markdown = DTMarkdown::instance(
-            "## session $sessionId",
+            '',
             $prefix . $outputText
         );
 

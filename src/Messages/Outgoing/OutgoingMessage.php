@@ -13,7 +13,7 @@
 namespace Commune\DingTalk\Messages\Outgoing;
 
 
-use Commune\DingTalk\Configs\GroupBotConfig;
+use Commune\DingTalk\Configs\BotConfig;
 use Commune\DingTalk\Messages\Incoming\DTMessage;
 use Commune\Message\Host\Convo\IText;
 use Commune\Message\Intercom\IInputMsg;
@@ -93,11 +93,11 @@ class OutgoingMessage extends AbsMessage
     }
 
     /**
-     * @param GroupBotConfig $group
+     * @param BotConfig $group
      * @param string|null $messageId
      * @return InputMsg
      */
-    public function toInputMessage(GroupBotConfig $group, string $messageId = null) : InputMsg
+    public function toInputMessage(BotConfig $group, string $messageId = null) : InputMsg
     {
         // 群聊的时候, 大家共享相同的 session
         if ($this->isGroupConversation()) {

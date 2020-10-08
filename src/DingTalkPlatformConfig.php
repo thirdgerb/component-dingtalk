@@ -15,7 +15,7 @@ namespace Commune\DingTalk;
 use Commune\Blueprint\Configs\PlatformConfig;
 use Commune\Chatbot\Hyperf\Platforms\Http\HfHttpConfig;
 use Commune\Chatbot\Hyperf\Platforms\Http\HfHttpPlatform;
-use Commune\DingTalk\Providers\GroupBotsServiceProvider;
+use Commune\DingTalk\Providers\CompanyBotsServiceProvider;
 use Commune\Platform\IPlatformConfig;
 
 /**
@@ -42,20 +42,9 @@ class DingTalkPlatformConfig extends IPlatformConfig implements PlatformConfig
             'concrete' => HfHttpPlatform::class,
             'bootShell' => null,
             'bootGhost' => false,
-            'providers' => [
-                GroupBotsServiceProvider::class => [
-                    'groupBots' => [
-                        [
-                            'id' => 'test',
-                            'url' => '/ding-talk/bots/test',
-                            'botName' => 'test',
-                            'appKey' => '',
-                            'appSecret' => '',
-                        ],
-                    ]
-                ]
-            ],
+            'providers' => [],
             'options' => [
+                // 服务器配置
                 HfHttpConfig::class => [
                     'server' => [
                         'name' => 'dingtalk',

@@ -72,10 +72,17 @@ class DTMarkdown extends AbsMessage implements VerbalMsg, AtSomeone, DTMessage
 
     public function toDingTalkData(): array
     {
+        $title = $this->title;
+        if (empty($title)) {
+            $title = mb_strlen(
+                trim($this->text),
+                20
+            );
+        }
         return [
             'msgtype' => DTMessage::TYPE_MARKDOWN,
             'markdown' => [
-                'title' => $this->title,
+                'title' => $title,
                 'text' => $this->text,
             ],
             'at' => [

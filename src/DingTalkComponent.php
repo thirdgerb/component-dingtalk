@@ -14,7 +14,8 @@ namespace Commune\DingTalk;
 
 use Commune\Blueprint\Framework\App;
 use Commune\DingTalk\Configs\EasyDingTalkConfig;
-use Commune\DingTalk\Configs\GroupBotConfig;
+use Commune\DingTalk\Configs\BotConfig;
+use Commune\DingTalk\Providers\CompanyBotsServiceProvider;
 use Commune\Framework\Component\AComponentOption;
 
 /**
@@ -25,7 +26,7 @@ use Commune\Framework\Component\AComponentOption;
  *
  * @author thirdgerb <thirdgerb@gmail.com>
  *
- * @property-read GroupBotConfig[] $bots    机器人的相关配置
+ * @property-read BotConfig[] $bots    机器人的相关配置
  * @property-read EasyDingTalkConfig $easyDingTalk  easy ding talk 的相关配置.
  */
 class DingTalkComponent extends AComponentOption
@@ -34,9 +35,7 @@ class DingTalkComponent extends AComponentOption
     {
         return [
             'bots' => [
-
             ],
-
             'easyDingTalk' => [
             ],
         ];
@@ -46,12 +45,20 @@ class DingTalkComponent extends AComponentOption
     {
         return [
             'easyDingTalk' => EasyDingTalkConfig::class,
-            'groups[]' => GroupBotConfig::class,
+            'groups[]' => BotConfig::class,
         ];
     }
 
     public function bootstrap(App $app): void
     {
+        // 注册机器人的配置与服务.
+        $registry = $app->getServiceRegistry();
+        $registry->registerProcProvider(
+            new CompanyBotsServiceProvider([
+                'bots' => $this->bots
+            ]),
+            false
+        );
     }
 
 

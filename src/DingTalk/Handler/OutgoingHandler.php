@@ -16,7 +16,7 @@ use Commune\Blueprint\Framework\ReqContainer;
 use Commune\DingTalk\Messages\Outgoing\OutgoingMessage;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use Commune\DingTalk\Configs\GroupBotConfig;
+use Commune\DingTalk\Configs\BotConfig;
 use Psr\Http\Message\ResponseInterface as PsrResponse;
 
 
@@ -31,7 +31,7 @@ interface OutgoingHandler
     /**
      * 响应一个请求.
      * @param ReqContainer $container
-     * @param GroupBotConfig $group
+     * @param BotConfig $group
      * @param RequestInterface $request
      * @param ResponseInterface $response
      * @param OutgoingMessage $message
@@ -39,7 +39,7 @@ interface OutgoingHandler
      */
     public function __invoke(
         ReqContainer $container,
-        GroupBotConfig $group,
+        BotConfig $group,
         RequestInterface $request,
         ResponseInterface $response,
         OutgoingMessage $message

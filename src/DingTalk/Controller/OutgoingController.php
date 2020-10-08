@@ -16,8 +16,8 @@ use Commune\Blueprint\Host;
 use Commune\Blueprint\Shell;
 use Commune\Contracts\Log\ExceptionReporter;
 use Commune\DingTalk\DingTalk\Handler\OutgoingHandler;
-use Commune\DingTalk\Configs\GroupBotConfig;
-use Commune\DingTalk\Contracts\GroupManager;
+use Commune\DingTalk\Configs\BotConfig;
+use Commune\DingTalk\Contracts\BotManager;
 use Commune\DingTalk\Messages\Incoming\DTEmpty;
 use Commune\DingTalk\Messages\Incoming\DTText;
 use Commune\DingTalk\Messages\Outgoing\OutgoingMessage;
@@ -83,11 +83,11 @@ class OutgoingController
 
             /**
              * 获取 group
-             * @var GroupManager $manager
+             * @var BotManager $manager
              */
-            $manager = $container->make(GroupManager::class);
+            $manager = $container->make(BotManager::class);
             $uri = $request->getRequestUri();
-            $group = $manager->findGroupByUri($uri);
+            $group = $manager->findBotByUri($uri);
 
             // 如果分组不存在, 则是重大异常.
             // 理论上能命中控制器, 就应该正确定义过
@@ -119,7 +119,7 @@ class OutgoingController
             // 绑定已有的元素.
             $container->instance(RequestInterface::class, $request);
             $container->instance(ResponseInterface::class, $response);
-            $container->instance(GroupBotConfig::class, $group);
+            $container->instance(BotConfig::class, $group);
 
             return $this->handleRequest(
                 $container,
@@ -143,13 +143,13 @@ class OutgoingController
 
     /**
      * 校验请求签名.
-     * @param GroupBotConfig $group
+     * @param BotConfig $group
      * @param RequestInterface $request
      * @param ResponseInterface $response
      * @return null|PsrResponse
      */
     protected function validateSignature(
-        GroupBotConfig $group,
+        BotConfig $group,
         RequestInterface $request,
         ResponseInterface $response
     ) : ? PsrResponse
@@ -224,6 +224,7 @@ class OutgoingController
     ) : ? OutgoingMessage
     {
         $content = $request->getBody()->getContents();
+        $this->logDebug("incoming message: $content");
 
         // 检查 body
         $data = json_decode($content, true);
@@ -243,7 +244,7 @@ class OutgoingController
 
     /**
      * @param ReqContainer $container
-     * @param GroupBotConfig $group
+     * @param BotConfig $group
      * @param RequestInterface $request
      * @param ResponseInterface $response
      * @param OutgoingMessage $message
@@ -251,7 +252,7 @@ class OutgoingController
      */
     protected function handleRequest(
         ReqContainer $container,
-        GroupBotConfig $group,
+        BotConfig $group,
         RequestInterface $request,
         ResponseInterface $response,
         OutgoingMessage $message
