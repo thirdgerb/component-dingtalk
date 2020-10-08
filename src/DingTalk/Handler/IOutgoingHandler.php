@@ -193,13 +193,13 @@ class IOutgoingHandler implements HasIdGenerator
 
     /**
      * 渲染输出的响应.
-     * @param OutgoingMessage $message
+     * @param OutgoingMessage $outgoing
      * @param ResponseInterface $response
      * @param ShellOutputResponse $appResponse
      * @return PsrResponse
      */
     protected function renderResponse(
-        OutgoingMessage $message,
+        OutgoingMessage $outgoing,
         ResponseInterface $response,
         ShellOutputResponse $appResponse
     ) : PsrResponse
@@ -228,9 +228,8 @@ class IOutgoingHandler implements HasIdGenerator
         }, $rendering);
 
         $outputText = implode("\n\n----\n\n", $rendering);
-        $senderNick = $message->senderNick;
-
-        $prefix = $message->isGroupConversation() ? "to $senderNick: " : '';
+        $senderNick = $outgoing->senderNick;
+        $prefix = $outgoing->isGroupConversation() ? "to $senderNick: " : '';
 
         $markdown = DTMarkdown::instance(
             '',
