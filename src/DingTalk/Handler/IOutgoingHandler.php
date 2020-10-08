@@ -23,9 +23,12 @@ use Commune\Blueprint\Kernel\Protocals\ShellOutputResponse;
 use Commune\DingTalk\Messages\Incoming\DTEmpty;
 use Commune\DingTalk\Messages\Incoming\DTMarkdown;
 use Commune\DingTalk\Messages\Incoming\DTMessage;
+use Commune\DingTalk\Messages\Incoming\DTText;
 use Commune\DingTalk\Messages\Outgoing\OutgoingMessage;
 use Commune\Kernel\Protocals\IShellInputRequest;
+use Commune\Message\Host\Convo\Verbal\MarkdownMsg;
 use Commune\Protocals\HostMsg\Convo\VerbalMsg;
+use Commune\Protocals\HostMsg\Tags\Markdown;
 use Commune\Support\Uuid\HasIdGenerator;
 use Commune\Support\Uuid\IdGeneratorHelper;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -235,12 +238,11 @@ class IOutgoingHandler implements HasIdGenerator
         $senderNick = $outgoing->senderNick;
         $prefix = $outgoing->isGroupConversation() ? "to $senderNick: \n" : '';
 
-        $markdown = DTMarkdown::instance(
-            '',
+        $text = DTText::instance(
             $prefix . $outputText
         );
 
-        return $response->json($markdown->toDingTalkData());
+        return $response->json($text->toDingTalkData());
     }
 
 }
