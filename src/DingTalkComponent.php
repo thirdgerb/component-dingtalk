@@ -45,7 +45,7 @@ class DingTalkComponent extends AComponentOption
     {
         return [
             'easyDingTalk' => EasyDingTalkConfig::class,
-            'groups[]' => BotConfig::class,
+            'bots[]' => BotConfig::class,
         ];
     }
 

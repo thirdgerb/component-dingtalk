@@ -32,7 +32,6 @@ use Commune\Platform\IPlatformConfig;
 class DingTalkPlatformConfig extends IPlatformConfig implements PlatformConfig
 {
 
-
     public static function stub(): array
     {
         return [
